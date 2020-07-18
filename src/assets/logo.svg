@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+  <title>Vue</title>
+  <desc>Created with Sketch.</desc>
+  <defs>
+    <linearGradient x1="69.644116%" y1="0%" x2="69.644116%" y2="100%" id="linearGradient-1">
+      <stop stop-color="#29CDFF" offset="0%"></stop>
+      <stop stop-color="#148EFF" offset="37.8600687%"></stop>
+      <stop stop-color="#0A60FF" offset="100%"></stop>
+    </linearGradient>
+    <linearGradient x1="-19.8191553%" y1="-36.7931464%" x2="138.57919%" y2="157.637507%" id="linearGradient-2">
+      <stop stop-color="#29CDFF" offset="0%"></stop>
+      <stop stop-color="#0F78FF" offset="100%"></stop>
+    </linearGradient>
+    <linearGradient x1="68.1279872%" y1="-35.6905737%" x2="30.4400914%" y2="114.942679%" id="linearGradient-3">
+      <stop stop-color="#FA8E7D" offset="0%"></stop>
+      <stop stop-color="#F74A5C" offset="51.2635191%"></stop>
+      <stop stop-color="#F51D2C" offset="100%"></stop>
+    </linearGradient>
+  </defs>
+  <g transform="translate(0.000000,116.000000) scale(0.100000,-0.100000)"
+     fill="#4ad2ff" stroke="none">
+    <path d="M290 564 l0 -426 218 4 218 3 76 38 c95 46 176 129 209 214 20 50 23
+76 23 183 0 108 -3 133 -23 184 -44 111 -141 188 -269 215 -29 6 -143 11 -252
+11 l-200 0 0 -426z m410 245 c94 -42 140 -118 140 -235 0 -178 -85 -265 -272
+-280 l-88 -7 0 278 0 278 88 -7 c51 -4 106 -16 132 -27z"/>
+  </g>
+</svg>
