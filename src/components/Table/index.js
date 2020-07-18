@@ -27,7 +27,7 @@ export default {
     },
     pageSize: {
       type: Number,
-      default: 10
+      default: 20
     },
     showSizeChanger: {
       type: Boolean,
@@ -135,6 +135,7 @@ export default {
      */
     loadData (pagination, filters, sorter) {
       this.localLoading = true
+      console.log('加载数据', pagination)
       const parameter = Object.assign({
         page: (pagination && pagination.current) ||
           this.showPagination && this.localPagination.current || this.pageNum,
@@ -155,21 +156,20 @@ export default {
       // eslint-disable-next-line
       if ((typeof result === 'object' || typeof result === 'function') && typeof result.then === 'function') {
         result.then(r => {
-          console.log('返回订单结果', this.localPagination.pageSize)
           this.localPagination = this.showPagination && Object.assign({}, this.localPagination, {
-            current: this.localPagination.current, // 返回结果中的当前分页数
+            current: Math.ceil(r.total / this.localPagination.pageSize), // 返回结果中的当前分页数
             total: r.total, // 返回结果中的总记录数
             showSizeChanger: this.showSizeChanger,
             pageSize: (pagination && pagination.pageSize) ||
               this.localPagination.pageSize
           }) || false
+          console.log('返回订单结果', this.localPagination.showSizeChanger)
           // 为防止删除数据后导致页面当前页面数据长度为 0 ,自动翻页到上一页
           if (r.rows.length === 0 && this.showPagination && this.localPagination.current > 1) {
             this.localPagination.current--
             this.loadData()
             return
           }
-
           // 这里用于判断接口是否有返回 r.totalCount 且 this.showPagination = true 且 pageNo 和 pageSize 存在 且 totalCount 小于等于 pageNo * pageSize 的大小
           // 当情况满足时，表示数据不满足分页大小，关闭 table 分页功能
           try {

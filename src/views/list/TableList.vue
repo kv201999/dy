@@ -5,8 +5,8 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="6" :sm="24">
-              <a-form-item label="订单号">
-                <a-input v-model="queryParam.transNo" placeholder=""/>
+              <a-form-item label="订单编号">
+                <a-input style="" v-model="queryParam.transNo" placeholder=""/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
@@ -33,11 +33,13 @@
                   </a-select>
                 </a-form-item>
               </a-col>
-              <a-col :md="10" :sm="24">
+              <a-col :md="12" :sm="24">
                 <a-form-item label="选择时间">
                   <a-range-picker
+                    @change="getDateTime"
                     :show-time="{defaultValue: [moment('00:00:00', 'HH:mm:ss'), moment('11:59:59', 'HH:mm:ss')]}"
                     format="YYYY-MM-DD HH:mm:ss"
+                    style="width: 440px"
                   />
                 </a-form-item>
               </a-col>
@@ -51,27 +53,14 @@
                 </a-form-item>
               </a-col>
             </template>
-            <a-col :md="8" :sm="24">
+            <a-col :md="6" :sm="24">
               <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
                 <a-button type="primary" icon="search" @click="$refs.table.refresh(true)">查询</a-button>
-                <a-button style="margin-left: 40px"  icon="pie-chart" @click="handleAdd">统计</a-button>
-                <a-button style="margin-left: 30px"  icon="file-excel" @click="handleAdd">导出</a-button>
+                <a-button style="margin-left: 70px" icon="file-excel" @click="handleAdd">导出</a-button>
               </span>
             </a-col>
           </a-row>
         </a-form>
-      </div>
-      <div class="table-operator">
-        <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
-          <a-menu slot="overlay">
-            <a-menu-item key="1"><a-icon type="delete" />删除</a-menu-item>
-            <!-- lock | unlock -->
-            <a-menu-item key="2"><a-icon type="lock" />锁定</a-menu-item>
-          </a-menu>
-          <a-button style="margin-left: 8px">
-            批量操作 <a-icon type="down" />
-          </a-button>
-        </a-dropdown>
       </div>
 
       <s-table
@@ -118,7 +107,7 @@ import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
 const columns = [
   {
-    title: '订单号',
+    title: '订单编号',
     dataIndex: 'transNo',
     scopedSlots: { customRender: 'transNo' }
   },
@@ -139,7 +128,7 @@ const columns = [
     scopedSlots: { customRender: 'amount' }
   },
   {
-    title: '更新时间',
+    title: '订单时间',
     dataIndex: 'createTime',
     sorter: true
   },
@@ -193,9 +182,13 @@ export default {
       // 高级搜索 展开/关闭
       advanced: true,
       // 查询参数
-      queryParam: {},
+      queryParam: {
+        createData: null,
+        endData: null
+      },
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
+        console.log('日期查询参数', this.queryParam)
         const requestParameters = Object.assign({}, parameter, this.queryParam)
         console.log('loadData request parameters:', requestParameters)
         return SearchOrder(requestParameters)
@@ -223,6 +216,17 @@ export default {
 
   },
   methods: {
+    getDateTime (date) {
+      if (date.length > 0) {
+        this.queryParam.createData = date[0].format('YYYY-MM-DD HH:mm:ss')
+        console.log(this.queryParam.createData)
+        this.queryParam.endData = date[1].format('YYYY-MM-DD HH:mm:ss')
+        console.log(this.queryParam.endData)
+      } else {
+        this.queryParam.createData = null
+        this.queryParam.endData = null
+      }
+    },
     range (start, end) {
       const result = []
       for (let i = start; i < end; i++) {
@@ -321,3 +325,18 @@ export default {
   }
 }
 </script>
+
+<style>
+  .ant-table-tbody > tr > td{
+    padding: 14px 14px;
+  }
+  .ant-table-tbody > tr > td:first-child{
+    width: 160px;
+    white-space: normal;
+    word-break: break-all;
+    font-size: 12px;
+    font-family: arial;
+    line-height: 13px;
+  }
+
+</style>
