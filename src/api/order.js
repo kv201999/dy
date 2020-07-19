@@ -1,7 +1,8 @@
 import request from '@/utils/request'
-
+import qs from 'qs'
 const api = {
   SearchOrder: '/smUserManage/getDataPersonal',
+  ExportOrder: '/smUserManage/excelExport',
   // role: '/role',
   service: '/service',
   permission: '/permission',
@@ -14,11 +15,10 @@ export default api
 export function SearchOrder (parameter) {
   return request({
     url: api.SearchOrder,
-    method: 'get',
-    params: parameter
+    method: 'post',
+    data: qs.stringify(parameter)
   })
 }
-
 // export function getRoleList (parameter) {
 //   return request({
 //     url: api.role,
@@ -26,12 +26,11 @@ export function SearchOrder (parameter) {
 //     params: parameter
 //   })
 // }
-
-export function getServiceList (parameter) {
+export function ExportOrder (parameter) {
   return request({
-    url: api.service,
+    url: api.ExportOrder,
     method: 'get',
-    params: parameter
+    responseType: 'blob'
   })
 }
 

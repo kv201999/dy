@@ -6,30 +6,36 @@
           <a-row :gutter="48">
             <a-col :md="6" :sm="24">
               <a-form-item label="订单编号">
-                <a-input style="" v-model="queryParam.transNo" placeholder=""/>
+                <a-input style="" v-model="queryParam.transo" placeholder=""/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
-              <a-form-item label="订单状态">
-                <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">
+              <a-form-item label="渠道类型">
+                <a-select v-model="queryParam.payChannelCode" placeholder="请选择" default-value="0">
                   <a-select-option value="0">全部</a-select-option>
-                  <a-select-option value="1">关闭</a-select-option>
-                  <a-select-option value="2">运行中</a-select-option>
+                  <a-select-option value="1">支付宝扫码</a-select-option>
+                  <a-select-option value="2">微信扫码</a-select-option>
+                  <a-select-option value="3">支付宝H5</a-select-option>
+                  <a-select-option value="4">微信H5</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <template v-if="advanced">
               <a-col :md="6" :sm="24">
                 <a-form-item label="渠道账号">
-                  <a-input-number v-model="queryParam.callNo" style="width: 100%"/>
+                  <a-input v-model="queryParam.threeName" style="width: 100%"/>
                 </a-form-item>
               </a-col>
               <a-col :md="6" :sm="24">
-                <a-form-item label="渠道类型">
-                  <a-select v-model="queryParam.useStatus" placeholder="请选择" default-value="0">
+                <a-form-item label="二维码类型">
+                  <a-select v-model="queryParam.qrtype" placeholder="请选择" default-value="0">
                     <a-select-option value="0">全部</a-select-option>
-                    <a-select-option value="1">关闭</a-select-option>
-                    <a-select-option value="2">运行中</a-select-option>
+                    <a-select-option value="1">个人红包（支付宝）</a-select-option>
+                    <a-select-option value="2">网商银行（支付宝）</a-select-option>
+                    <a-select-option value="3">普通银行（支付宝）</a-select-option>
+                    <a-select-option value="4">收款码（支付宝）</a-select-option>
+                    <a-select-option value="5">主动收款码（支付宝）</a-select-option>
+                    <a-select-option value="6">实时转账码（支付宝）</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -45,10 +51,12 @@
               </a-col>
               <a-col :md="6" :sm="24">
                 <a-form-item label="订单状态">
-                  <a-select placeholder="请选择" default-value="0">
-                    <a-select-option value="0">全部</a-select-option>
-                    <a-select-option value="1">关闭</a-select-option>
-                    <a-select-option value="2">运行中</a-select-option>
+                  <a-select v-model="queryParam.payOrderStatus" placeholder="请选择" default-value="null">
+                    <a-select-option value="null">全部</a-select-option>
+                    <a-select-option value="0">支付申请</a-select-option>
+                    <a-select-option value="2">支付成功</a-select-option>
+                    <a-select-option value="-1">支付失败</a-select-option>
+                    <a-select-option value="-2">支付出错</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -56,22 +64,21 @@
             <a-col :md="6" :sm="24">
               <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
                 <a-button type="primary" icon="search" @click="$refs.table.refresh(true)">查询</a-button>
-                <a-button style="margin-left: 70px" icon="file-excel" @click="handleAdd">导出</a-button>
+                <a-button style="margin-left: 70px" icon="file-excel" @click="ExportOrder">导出</a-button>
               </span>
             </a-col>
           </a-row>
         </a-form>
       </div>
-
-      <s-table
-        ref="table"
-        size="default"
-        rowKey="key"
-        :columns="columns"
-        :data="loadData"
-        :alert="true"
-        showPagination="auto"
-      >
+        <s-table
+          ref="table"
+          size="default"
+          rowKey="transNo"
+          :columns="columns"
+          :data="loadData"
+          :alert="true"
+          showPagination="auto"
+        >
         <span slot="status" slot-scope="text">
           <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
         </span>
@@ -102,7 +109,7 @@
 <script>
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
-import { SearchOrder } from '@/api/order'
+import { SearchOrder, ExportOrder } from '@/api/order'
 import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
 const columns = [
@@ -184,7 +191,15 @@ export default {
       // 查询参数
       queryParam: {
         createData: null,
-        endData: null
+        endData: null,
+        payOrderStatus: null,
+        threeName: null,
+        qrtype: null,
+        qrRemark: null,
+        payChannelCode: null,
+        orderBy: null,
+        transo: null,
+        amount: null
       },
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
@@ -193,7 +208,7 @@ export default {
         console.log('loadData request parameters:', requestParameters)
         return SearchOrder(requestParameters)
           .then(res => {
-            console.log(res)
+            console.log('订单总数', res.total)
             return res
           })
       },
@@ -210,12 +225,27 @@ export default {
     }
   },
   created () {
-   // getRoleList({ t: new Date() })
+    // getRoleList({ t: new Date() })
   },
   computed: {
 
   },
   methods: {
+    ExportOrder () {
+      const requestParameters = Object.assign({}, this.parameter, this.queryParam)
+      return ExportOrder(requestParameters)
+        .then(res => {
+          const downloadElement = document.createElement('a')
+          const href = window.URL
+          downloadElement.href = href
+          downloadElement.download = 'result.xlsx'
+          document.body.appendChild(downloadElement)
+          downloadElement.click()
+          document.body.removeChild(downloadElement)
+          window.URL.revokeObjectURL(href)
+          return res
+        })
+    },
     getDateTime (date) {
       if (date.length > 0) {
         this.queryParam.createData = date[0].format('YYYY-MM-DD HH:mm:ss')

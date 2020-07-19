@@ -27,7 +27,7 @@ export default {
     },
     pageSize: {
       type: Number,
-      default: 20
+      default: 10
     },
     showSizeChanger: {
       type: Boolean,
@@ -76,11 +76,13 @@ export default {
   }),
   watch: {
     'localPagination.current' (val) {
+      console.log('获取URI', this.pageURI)
+      console.log('获取router', this.$router)
       this.pageURI && this.$router.push({
         ...this.$route,
         name: this.$route.name,
         params: Object.assign({}, this.$route.params, {
-          pageNo: val
+        pageNo: val
         })
       })
       // change pagination, reset total data
@@ -90,7 +92,7 @@ export default {
     },
     pageNum (val) {
       Object.assign(this.localPagination, {
-        current: val
+        pageNo: 66
       })
     },
     pageSize (val) {
@@ -106,6 +108,8 @@ export default {
   },
   created () {
     const { pageNo } = this.$route.params
+    console.log('翻页数据', this.$route.params)
+    console.log('当前页码', this.localPagination.current)
     const localPageNum = this.pageURI && (pageNo && parseInt(pageNo)) || this.pageNum
     this.localPagination = ['auto', true].includes(this.showPagination) && Object.assign({}, this.localPagination, {
       current: localPageNum,
@@ -135,35 +139,34 @@ export default {
      */
     loadData (pagination, filters, sorter) {
       this.localLoading = true
-      console.log('加载数据', pagination)
       const parameter = Object.assign({
-        page: (pagination && pagination.current) ||
-          this.showPagination && this.localPagination.current || this.pageNum,
+          page: (pagination && pagination.current) ||
+            this.showPagination && this.localPagination.current || this.pageNum,
           rows: (pagination && pagination.pageSize) ||
-          this.showPagination && this.localPagination.pageSize || this.pageSize
-      },
-      (sorter && sorter.field && {
-        sortField: sorter.field
-      }) || {},
-      (sorter && sorter.order && {
-        sortOrder: sorter.order
-      }) || {}, {
-        ...filters
-      }
+            this.showPagination && this.localPagination.pageSize || this.pageSize
+        },
+        (sorter && sorter.field && {
+          sortField: sorter.field
+        }) || {},
+        (sorter && sorter.order && {
+          sortOrder: sorter.order
+        }) || {}, {
+          ...filters
+        }
       )
       const result = this.data(parameter)
       // 对接自己的通用数据接口需要修改下方代码中的 r.pageNo, r.totalCount, r.data
       // eslint-disable-next-line
       if ((typeof result === 'object' || typeof result === 'function') && typeof result.then === 'function') {
         result.then(r => {
+        //  const pageNo = Math.ceil(r.total / this.localPagination.pageSize)
           this.localPagination = this.showPagination && Object.assign({}, this.localPagination, {
-            current: Math.ceil(r.total / this.localPagination.pageSize), // 返回结果中的当前分页数
+            current: parameter.page, // 返回结果中的当前分页数
             total: r.total, // 返回结果中的总记录数
             showSizeChanger: this.showSizeChanger,
-            pageSize: (pagination && pagination.pageSize) ||
-              this.localPagination.pageSize
+            pageSize: this.localPagination.pageSize
           }) || false
-          console.log('返回订单结果', this.localPagination.showSizeChanger)
+          console.log('当前页面', this.localPagination.current)
           // 为防止删除数据后导致页面当前页面数据长度为 0 ,自动翻页到上一页
           if (r.rows.length === 0 && this.showPagination && this.localPagination.current > 1) {
             this.localPagination.current--
@@ -173,7 +176,7 @@ export default {
           // 这里用于判断接口是否有返回 r.totalCount 且 this.showPagination = true 且 pageNo 和 pageSize 存在 且 totalCount 小于等于 pageNo * pageSize 的大小
           // 当情况满足时，表示数据不满足分页大小，关闭 table 分页功能
           try {
-            if ((['auto', true].includes(this.showPagination) && r.total <= (r.this.localPagination.current * this.localPagination.pageSize))) {
+            if ((['auto', true].includes(this.showPagination) && r.total <= (this.localPagination.current * this.localPagination.pageSize))) {
               this.localPagination.hideOnSinglePage = true
             }
           } catch (e) {
@@ -233,10 +236,10 @@ export default {
       if (this.selectedRowKeys.length <= 0) return null
       return (
         <a style="margin-left: 24px" onClick={() => {
-          callback()
-          this.clearSelected()
-        }}>清空</a>
-      )
+        callback()
+        this.clearSelected()
+      }}>清空</a>
+    )
     },
     renderAlert () {
       // 绘制统计列数据
@@ -256,13 +259,13 @@ export default {
       // 绘制 alert 组件
       return (
         <a-alert showIcon={true} style="margin-bottom: 16px">
-          <template slot="message">
-            <span style="margin-right: 12px">已选择: <a style="font-weight: 600">{this.selectedRows.length}</a></span>
-            {needTotalItems}
-            {clearItem}
-          </template>
-        </a-alert>
-      )
+        <template slot="message">
+        <span style="margin-right: 12px">已选择: <a style="font-weight: 600">{this.selectedRows.length}</a></span>
+      {needTotalItems}
+      {clearItem}
+    </template>
+      </a-alert>
+    )
     }
   },
 
@@ -301,15 +304,15 @@ export default {
     })
     const table = (
       <a-table {...{ props, scopedSlots: { ...this.$scopedSlots } }} onChange={this.loadData} onExpand={ (expanded, record) => { this.$emit('expand', expanded, record) } }>
-        { Object.keys(this.$slots).map(name => (<template slot={name}>{this.$slots[name]}</template>)) }
+    { Object.keys(this.$slots).map(name => (<template slot={name}>{this.$slots[name]}</template>)) }
       </a-table>
     )
 
-    return (
-      <div class="table-wrapper">
-        { showAlert ? this.renderAlert() : null }
-        { table }
-      </div>
+      return (
+        <div class="table-wrapper">
+      { showAlert ? this.renderAlert() : null }
+      { table }
+    </div>
     )
+    }
   }
-}
