@@ -86,7 +86,7 @@ export const asyncRouterMap = [
             name: 'TableListWrapper',
             hideChildrenInMenu: true, // 强制显示 MenuItem 而不是 SubMenu
             component: () => import('@/views/list/TableList'),
-            meta: { title: '查询表格', keepAlive: true, permission: [ 'table' ] }
+            meta: { title: '订单管理', keepAlive: true, permission: [ 'table' ] }
           },
           {
             path: '/list/basic-list',

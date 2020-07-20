@@ -1,12 +1,11 @@
 <template>
-  <page-header-wrapper>
     <a-card :bordered="false">
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="6" :sm="24">
               <a-form-item label="订单编号">
-                <a-input style="" v-model="queryParam.transo" placeholder=""/>
+                <a-input @keyup.enter="$refs.table.refresh(true)" style="" v-model="queryParam.transo" placeholder=""/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
@@ -23,7 +22,7 @@
             <template v-if="advanced">
               <a-col :md="6" :sm="24">
                 <a-form-item label="渠道账号">
-                  <a-input v-model="queryParam.threeName" style="width: 100%"/>
+                  <a-input @keyup.enter="$refs.table.refresh(true)" v-model="queryParam.threeName" style="width: 100%"/>
                 </a-form-item>
               </a-col>
               <a-col :md="6" :sm="24">
@@ -78,18 +77,20 @@
           :data="loadData"
           :alert="true"
           showPagination="auto"
+          @change="onChange"
+          :sortDirections="['asc', 'desc']"
         >
-        <span slot="status" slot-scope="text">
-          <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
+        <span slot="createTime" slot-scope="text">
+          <a-badge :createTime="text | statusTypeFilter" :text="text | statusFilter" />
         </span>
         <span slot="description" slot-scope="text">
           <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
         </span>
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEdit(record)">配置</a>
+            <a @click="handleEdit(record)">重置</a>
             <a-divider type="vertical" />
-            <a @click="handleSub(record)">订阅报警</a>
+            <a @click="handleSub(record)">查看详情</a>
           </template>
         </span>
       </s-table>
@@ -103,7 +104,6 @@
       />
       <step-by-step-modal ref="modal" @ok="handleOk"/>
     </a-card>
-  </page-header-wrapper>
 </template>
 
 <script>
@@ -125,19 +125,36 @@ const columns = [
   },
   {
     title: '渠道账号',
-    dataIndex: 'payAccountName',
-    sorter: true,
-    needTotal: true
+    dataIndex: 'payAccountName'
+  },
+  {
+    title: '二维码类型',
+    dataIndex: 'qrtypeStr'
   },
   {
     title: '订单金额',
     dataIndex: 'amount',
+    className: 'column-amount',
+    needTotal: true,
     scopedSlots: { customRender: 'amount' }
   },
   {
+    title: '手续费',
+    dataIndex: 'fee',
+    className: 'column-amount',
+    needTotal: true,
+    scopedSlots: { customRender: 'fee' }
+  },
+  {
+    title: '商户入账',
+    dataIndex: 'actualAmount',
+    className: 'column-amount',
+    needTotal: true,
+    scopedSlots: { customRender: 'actualAmount' }
+  },
+  {
     title: '订单时间',
-    dataIndex: 'createTime',
-    sorter: true
+    dataIndex: 'createTime'
   },
   {
     title: '订单状态',
@@ -231,6 +248,9 @@ export default {
 
   },
   methods: {
+    onChange (pagination, filters, sorter) {
+      console.log('params', pagination, filters, sorter)
+    },
     ExportOrder () {
       const requestParameters = Object.assign({}, this.parameter, this.queryParam)
       return ExportOrder(requestParameters)
@@ -358,7 +378,15 @@ export default {
 
 <style>
   .ant-table-tbody > tr > td{
-    padding: 14px 14px;
+    padding: 14px 16px;
+    color: black;
+    font-size: 13px;
+  }
+  .ant-table-thead > tr > th{
+    padding: 14px 16px;
+    color: black;
+    font-size: 13px;
+    font-weight: bold;
   }
   .ant-table-tbody > tr > td:first-child{
     width: 160px;
@@ -368,5 +396,7 @@ export default {
     font-family: arial;
     line-height: 13px;
   }
-
+  .column-amount{
+    text-align: right!important;
+  }
 </style>
