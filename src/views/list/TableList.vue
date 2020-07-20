@@ -77,8 +77,6 @@
           :data="loadData"
           :alert="true"
           showPagination="auto"
-          @change="onChange"
-          :sortDirections="['asc', 'desc']"
         >
         <span slot="createTime" slot-scope="text">
           <a-badge :createTime="text | statusTypeFilter" :text="text | statusFilter" />
@@ -155,6 +153,7 @@ const columns = [
   {
     title: '订单时间',
     dataIndex: 'createTime'
+   // sorter: true
   },
   {
     title: '订单状态',
@@ -248,9 +247,6 @@ export default {
 
   },
   methods: {
-    onChange (pagination, filters, sorter) {
-      console.log('params', pagination, filters, sorter)
-    },
     ExportOrder () {
       const requestParameters = Object.assign({}, this.parameter, this.queryParam)
       return ExportOrder(requestParameters)
@@ -283,20 +279,6 @@ export default {
         result.push(i)
       }
       return result
-    },
-    disabledRangeTime (_, type) {
-      if (type === 'start') {
-        return {
-          disabledHours: () => this.range(0, 60).splice(4, 20),
-          disabledMinutes: () => this.range(30, 60),
-          disabledSeconds: () => [55, 56]
-        }
-      }
-      return {
-        disabledHours: () => this.range(0, 60).splice(20, 4),
-        disabledMinutes: () => this.range(0, 31),
-        disabledSeconds: () => [55, 56]
-      }
     },
     handleAdd () {
       this.mdl = null

@@ -92,7 +92,7 @@ export default {
     },
     pageNum (val) {
       Object.assign(this.localPagination, {
-        pageNo: 66
+        pageNo: val
       })
     },
     pageSize (val) {
@@ -164,7 +164,7 @@ export default {
             current: parameter.page, // 返回结果中的当前分页数
             total: r.total, // 返回结果中的总记录数
             showSizeChanger: this.showSizeChanger,
-            pageSize: this.localPagination.pageSize
+            pageSize: parameter.rows
           }) || false
           console.log('当前页面', this.localPagination.current)
           // 为防止删除数据后导致页面当前页面数据长度为 0 ,自动翻页到上一页
@@ -245,7 +245,7 @@ export default {
       // 绘制统计列数据
       const needTotalItems = this.needTotalList.map((item) => {
         return (<span style="margin-right: 12px">
-          {item.title}总计 <a style="font-weight: 600">{!item.customRender ? item.total : item.customRender(item.total)}</a>
+          {item.title} <a style="font-weight: 600">{!item.customRender ? item.total : item.customRender(item.total)}</a>
         </span>)
       })
 
@@ -260,7 +260,7 @@ export default {
       return (
         <a-alert showIcon={true} style="margin-bottom: 16px">
         <template slot="message">
-        <span style="margin-right: 12px">已选择: <a style="font-weight: 600">{this.selectedRows.length}</a></span>
+        <span style="margin-right: 12px">已查询: <a style="font-weight: 600">{this.localPagination.total}</a></span>
       {needTotalItems}
       {clearItem}
     </template>
