@@ -2,6 +2,7 @@ import request from '@/utils/request'
 import qs from 'qs'
 const userApi = {
   Login: '/login/loginDo',
+  Googlecode: '/system/merchantTransactionAmount',
   Logout: '/auth/logout',
   ForgePassword: '/auth/forge-password',
   Register: '/auth/register',
@@ -31,7 +32,13 @@ export function login (parameter) {
     data: qs.stringify(parameter)
   })
 }
-
+export function Googlecode (parameter) {
+  return request({
+    url: userApi.Googlecode,
+    method: 'post',
+    data: parameter
+  })
+}
 export function getSmsCaptcha (parameter) {
   return request({
     url: userApi.SendSms,

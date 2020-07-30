@@ -63,7 +63,7 @@
   import TwoStepCaptcha from '@/components/tools/TwoStepCaptcha'
   import { mapActions } from 'vuex'
   import { timeFix } from '@/utils/util'
-  import { getSmsCaptcha, get2step } from '@/api/login'
+  import { getSmsCaptcha, get2step, Googlecode } from '@/api/login'
 
   export default {
     components: {
@@ -203,17 +203,49 @@
         //   })
         // })
         // */
-
         if (res.resultCode === 10000) {
-          this.$router.push({ path: '/' })
-          // 延迟 1 秒显示欢迎信息
-          setTimeout(() => {
-            this.$notification.success({
-              message: `${timeFix()}`,
-              description: '欢迎回到您的管理中心'
+          Googlecode().then((re) => {
+            return re
+          }).catch(err => this.requestFailed(err))
+            .finally(() => {
+              this.state.loginBtn = false
             })
-          }, 1000)
-          this.isLoginError = false
+          console.log('验证谷歌', re)
+          if (re.isGoogel === 0) {
+            this.$dialog(Googlecode,
+              // component props
+              {
+                record: {},
+                on: {
+                  ok () {
+                    console.log('ok 回调')
+                  },
+                  cancel () {
+                    console.log('cancel 回调')
+                  },
+                  close () {
+                    console.log('modal close 回调')
+                  }
+                }
+              },
+              // modal props
+              {
+                title: '新增',
+                width: 700,
+                centered: true,
+                maskClosable: false
+              })
+          } else {
+            this.$router.push({ path: '/' })
+            // 延迟 1 秒显示欢迎信息
+            setTimeout(() => {
+              this.$notification.success({
+                message: `${timeFix()}`,
+                description: '欢迎回到您的管理中心'
+              })
+            }, 1000)
+            this.isLoginError = false
+          }
         } else {
           this.$notification['error']({
             message: '登录失败',
