@@ -8,35 +8,35 @@
       @submit="handleSubmit"
     >
 
-        <a-tab key="tab1" tab="账号密码登录">
-          <a-alert v-if="isLoginError" type="error" showIcon style="margin-bottom: 24px;" message="账户或密码错误（admin/ant.design )" />
-          <a-form-item>
-            <a-input
-              size="large"
-              type="text"
-              placeholder="请输入用户名"
-              v-decorator="[
-                'username',
-                {rules: [{ required: true, message: '请输入帐户名或邮箱地址' }, { validator: handleUsernameOrEmail }], validateTrigger: 'change'}
-              ]"
-            >
-              <a-icon slot="prefix" type="user" :style="{ color: 'rgba(0,0,0,.25)' }"/>
-            </a-input>
-          </a-form-item>
+      <a-tab key="tab1" tab="账号密码登录">
+        <a-alert v-if="isLoginError" type="error" showIcon style="margin-bottom: 24px;" message="账户或密码错误（admin/ant.design )" />
+        <a-form-item>
+          <a-input
+            size="large"
+            type="text"
+            placeholder="请输入用户名"
+            v-decorator="[
+              'username',
+              {rules: [{ required: true, message: '请输入帐户名或邮箱地址' }, { validator: handleUsernameOrEmail }], validateTrigger: 'change'}
+            ]"
+          >
+            <a-icon slot="prefix" type="user" :style="{ color: 'rgba(0,0,0,.25)' }"/>
+          </a-input>
+        </a-form-item>
 
-          <a-form-item>
-            <a-input-password
-              size="large"
-              placeholder="请输入密码"
-              v-decorator="[
-                'password',
-                {rules: [{ required: true, message: '请输入密码' }], validateTrigger: 'blur'}
-              ]"
-            >
-              <a-icon slot="prefix" type="lock" :style="{ color: 'rgba(0,0,0,.25)' }"/>
-            </a-input-password>
-          </a-form-item>
-        </a-tab>
+        <a-form-item>
+          <a-input-password
+            size="large"
+            placeholder="请输入密码"
+            v-decorator="[
+              'password',
+              {rules: [{ required: true, message: '请输入密码' }], validateTrigger: 'blur'}
+            ]"
+          >
+            <a-icon slot="prefix" type="lock" :style="{ color: 'rgba(0,0,0,.25)' }"/>
+          </a-input-password>
+        </a-form-item>
+      </a-tab>
       <a-form-item style="margin-top:24px">
         <a-button
           size="large"

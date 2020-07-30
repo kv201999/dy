@@ -30,6 +30,7 @@ export function ExportOrder (parameter) {
   return request({
     url: api.ExportOrder,
     method: 'get',
+    params: parameter,
     responseType: 'blob'
   })
 }
